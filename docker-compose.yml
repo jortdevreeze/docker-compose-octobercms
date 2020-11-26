@@ -1,0 +1,66 @@
+version: '3.8'
+
+networks:
+  octobercms:
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    container_name: nginx_octobercms
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html:delegated
+    depends_on:
+      - php
+      - db
+    networks:
+      - octobercms
+
+  db:
+    image: mysql:5.7.29
+    container_name: mysql_octobercms
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: octobercms
+      MYSQL_USER: octobercms
+      MYSQL_PASSWORD: octobercms
+      MYSQL_ROOT_PASSWORD: octobercms
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - octobercms
+    volumes:
+      - ./mysql:/var/lib/mysql
+
+  php:
+    build:
+      context: .
+      dockerfile: php.dockerfile
+    container_name: php_octobercms
+    volumes:
+      - ./src:/var/www/html:delegated
+    ports:
+      - "9000:9000"
+    networks:
+      - octobercms
+
+  composer:
+    build:
+      context: .
+      dockerfile: composer.dockerfile
+    container_name: composer_octobercms
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - php
+    user: octobercms
+    networks:
+      - octobercms
+    entrypoint: ['composer', '--ignore-platform-reqs']
