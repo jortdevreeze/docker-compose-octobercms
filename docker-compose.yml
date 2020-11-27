@@ -11,6 +11,8 @@ services:
     container_name: nginx_octobercms
     ports:
       - "8080:80"
+    environment:
+      PHP_OPCACHE_VALIDATE_TIMESTAMPS: 1
     volumes:
       - ./src:/var/www/html:delegated
     depends_on:
