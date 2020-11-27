@@ -30,5 +30,6 @@ RUN docker-php-ext-install zip
 
 RUN docker-php-ext-install pdo pdo_mysql
 
-
-
+RUN docker-php-ext-install opcache
+ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0"
+ADD ./php/opcache.ini "$PHP_INI_DIR/conf.d/opcache.ini"
